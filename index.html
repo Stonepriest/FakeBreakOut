@@ -16,18 +16,43 @@
         const PADDLE_HEIGHT = 20;
         const BRICKS_WIDTH = 60;
         const BRICKS_HEIGHT = 30;
+        const BALL_RADIUS = 8;
         var stage;
         var paddle;
         var ball;
+        var bricks = [];
 
         function init() {
             stage = new createjs.Stage("gameCanvas");
             createjs.Ticker.setFPS(60);
-            createjs.Ticker.addEventListener("tick", stage);
+            createjs.Ticker.addEventListener("tick", tick);
 
             createBrickGrid();
             createBall();
             createPaddle();
+        }
+
+        function tick() {
+            stage.update();
+
+            if(ball.up) {
+                ball.y -= ball.ySpeed;
+                ball.x -= ball.ySpeed;
+            }
+
+            for(var i=0;i<bricks.length;i++) {
+                if(checkCollision(ball,bricks[i])){
+                    destroyBrick(bricks[i]);
+                }
+            }
+        }
+
+        function checkCollision(ballElement, brickElement) {
+            if(ballElement.x + BALL_RADIUS <= brickElement.x - BRICKS_WIDTH/2 || ballElement.x - BALL_RADIUS 
+                >= brickElement.x + BRICKS_WIDTH/2 || ballElement.y - BALL_RADIUS >= brickElement.y + 
+                BRICKS_HEIGHT/2 || ballElement.y + BALL_RADIUS <= brickElement.y - BRICKS_HEIGHT/2) return 
+                false;
+            return true;
         }
 
         function createBrickGrid() {
@@ -43,13 +68,14 @@
             brick.graphics.beginFill('#000fff');
             brick.graphics.drawRect(0, 0, BRICKS_WIDTH, BRICKS_HEIGHT);
             brick.graphics.endFill();
-            stage.addChild(brick);
+            
+            brick.x = x;
+            brick.y = y;
 
             brick.regX = BRICKS_WIDTH/2;
             brick.regY = BRICKS_HEIGHT/2;
-
-            brick.x = x;
-            brick.y = y;
+            stage.addChild(brick);
+            bricks.push(brick);
         }
 
         function destroyBrick(brick) {
@@ -58,10 +84,17 @@
 
         function createBall() {
             ball = new createjs.Shape();
-            ball.graphics.beginFill("Red").drawCircle(0, 0, 8);
+            ball.graphics.beginFill("Red").drawCircle(0, 0, BALL_RADIUS);
             ball.x = stage.canvas.width/2;
             ball.y = stage.canvas.height/2;
             stage.addChild(ball);
+
+            ball.up = true;
+            ball.right = true;
+            ball.xSpeed = 0;
+            ball.ySpeed = 1;
+            ball.lastX = 0;
+            ball.lastY = 0;
         }
 
         function createPaddle() {
