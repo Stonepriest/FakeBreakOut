@@ -83,6 +83,59 @@
             ball.lastY = ball.y;
         }
 
+        function checkCollision(ballElement, hitElement) {
+            var leftBorder = (hitElement.x - hitElement.getBounds().width/2);
+            var rightBorder = (hitElement.x + hitElement.getBounds().width/2);
+            var topBorder = (hitElement.y - hitElement.getBounds().height/2);
+            var bottomBorder = (hitElement.y + hitElement.getBounds().height/2);
+            var previousBallLeftBorder = ballElement.lastX - BALL_RADIUS;
+            var previousBallRightBorder = ballElement.lastX + BALL_RADIUS;
+            var previousBallTopBorder = ballElement.lastY - BALL_RADIUS;
+            var previousBallBottomBorder = ballElement.lastY + BALL_RADIUS;
+            var ballLeftBorder = ballElement.x - BALL_RADIUS;
+            var ballRightBorder = ballElement.x + BALL_RADIUS;
+            var ballTopBorder = ballElement.y - BALL_RADIUS;
+            var ballBottomBorder = ballElement.y + BALL_RADIUS;
+
+            if((ballLeftBorder<=rightBorder) && (ballRightBorder>=leftBorder) && (ballTopBorder <= 
+                bottomBorder) && (ballBottomBorder >= topBorder))
+            {
+                if((ballTopBorder <= bottomBorder)&&(previousBallTopBorder > bottomBorder))
+                {
+                    // Hit from the bottom
+                    ballElement.up = false;
+                    ballElement.y = bottomBorder * BALL_RADIUS;
+                }
+
+                if((ballBottomBorder >= topBorder)&&(previousBallTopBorder<topBorder))
+                {
+                    // Hit from the top
+                    ballElement.up = true;
+                    ballElement.y = topBorder * BALL_RADIUS;
+                }
+
+                if((ballLeftBorder <= rightBorder)&&(previousBallLeftBorder>rightBorder))
+                {
+                    // Hit from the right
+                    ballElement.right = true;
+                    ballElement.x = rightBorder * BALL_RADIUS;
+                }
+
+                if((ballRightBorder >= leftBorder)&&(previousBallRightBorder<leftBorder))
+                {
+                    // Hit from the left
+                    ballElement.right = false;
+                    ballElement.x = leftBorder * BALL_RADIUS;
+                }
+
+                ballElement.lastX = ballElement.x;
+                ballElement.lastY = ballElement.y;
+
+                return true;
+            }
+            return false;
+        }
+
         function checkCollision(ballElement, brickElement) {
             if(ballElement.x + BALL_RADIUS <= brickElement.x - BRICKS_WIDTH/2 || ballElement.x - BALL_RADIUS 
                 >= brickElement.x + BRICKS_WIDTH/2 || ballElement.y - BALL_RADIUS >= brickElement.y + 
