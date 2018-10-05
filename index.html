@@ -26,6 +26,11 @@
         var lives = 3;
         var scoreText;
         var gameStarted = false;
+        const KEYCODE_Left = 37;
+        const KEYCODE_RIGHT = 39;
+        const SPACEBAR = 32;
+        var keyboardMoveLeft = false;
+        var keyboardMoveRight = false;
 
         function init() {
             stage = new createjs.Stage("gameCanvas");
@@ -37,8 +42,23 @@
             createPaddle();
             createBall();
             createBrickGrid();
+
+            window.onkeyup = keyUpHandler;
+            window.onkeydown = keyDownHandler;
+
+            stage.on("stagemousemove", function(event)
+            {
+                paddle.x = stage.mouseX;
+            });
+
             stage.on("stagemousedown",function(event){
-                if(!gameStarted)
+                startLevel();
+            });
+        }
+
+        function startLevel()
+        {
+            if(!gameStarted)
                 {
                     gameStarted = true;
                     ball.xSpeed = 5;
@@ -46,7 +66,24 @@
                     ball.up = true;
                     ball.right = true;
                 }
-            });
+        }
+        function keyDownHandler(e)
+        {
+            switch(e.keyCode)
+            {
+                case KEYCODE_Left: keyboardMoveLeft = true; break;
+                case KEYCODE_RIGHT: keyboardMoveRight = true; break;
+                case SPACEBAR: startLevel(); break;
+            }
+        }
+
+        function keyUpHandler(e)
+        {
+            switch(e.keyCode)
+            {
+                case KEYCODE_Left: keyboardMoveLeft = false;
+                case KEYCODE_RIGHT: keyboardMoveRight = false;
+            }
         }
 
         function loseLife() {
@@ -72,8 +109,17 @@
 
         function tick(event) {
 
-            paddle.x = stage.mouseX;
             stage.update();
+
+            if(keyboardMoveLeft)
+            {
+                paddle.x -= 5;
+            }
+
+            if(keyboardMoveRight)
+            {
+                paddle.x += 5
+            }
 
             if(paddle.x+PADDLE_WIDTH/2>stage.canvas.width)
             {
